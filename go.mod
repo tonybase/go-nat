@@ -1,5 +1,7 @@
 module github.com/libp2p/go-nat
 
+go 1.12
+
 require (
 	github.com/huin/goupnp v1.0.0
 	github.com/jackpal/gateway v1.0.5

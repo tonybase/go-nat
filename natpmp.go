@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jackpal/gateway"
-	"github.com/jackpal/go-nat-pmp"
+	natpmp "github.com/jackpal/go-nat-pmp"
 )
 
 var (
@@ -94,6 +94,22 @@ func (n *natpmpNAT) GetExternalAddress() (addr net.IP, err error) {
 
 	d := res.ExternalIPAddress
 	return net.IPv4(d[0], d[1], d[2], d[3]), nil
+}
+
+func (n *natpmpNAT) AddMapping(protocol string, externalPort, internalPort int, description string, timeout time.Duration) (int, error) {
+	var (
+		err error
+	)
+
+	timeoutInSeconds := int(timeout / time.Second)
+
+	_, err = n.c.AddPortMapping(protocol, internalPort, externalPort, timeoutInSeconds)
+	if err == nil {
+		n.ports[internalPort] = externalPort
+		return externalPort, nil
+	}
+
+	return 0, err
 }
 
 func (n *natpmpNAT) AddPortMapping(protocol string, internalPort int, description string, timeout time.Duration) (int, error) {

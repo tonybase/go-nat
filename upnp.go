@@ -248,6 +248,21 @@ func mapProtocol(s string) string {
 		panic("invalid protocol: " + s)
 	}
 }
+func (u *upnp_NAT) AddMapping(protocol string, externalPort, internalPort int, description string, timeout time.Duration) (int, error) {
+	ip, err := u.GetInternalAddress()
+	if err != nil {
+		return 0, nil
+	}
+
+	timeoutInSeconds := uint32(timeout / time.Second)
+
+	err = u.c.AddPortMapping("", uint16(externalPort), mapProtocol(protocol), uint16(internalPort), ip.String(), true, description, timeoutInSeconds)
+	if err == nil {
+		return externalPort, nil
+	}
+
+	return 0, err
+}
 
 func (u *upnp_NAT) AddPortMapping(protocol string, internalPort int, description string, timeout time.Duration) (int, error) {
 	ip, err := u.GetInternalAddress()
